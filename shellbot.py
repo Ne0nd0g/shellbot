@@ -162,6 +162,9 @@ def send_new_agent_message_slack(agentType, payload):
 
 def send_new_agent_message_teams(agentType, payload):
     """Send a Microsoft Teams Activity Card HTTP POST message to a web hook"""
+    
+    if teamsHook is None:
+        print debug + "Teams hook not provided. Skipping."
 
     if DEBUG:
         print debug + "New Microsoft Teams agent message agent: %s, payload: %s" % (agentType, payload)
