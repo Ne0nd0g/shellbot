@@ -3,7 +3,7 @@
 __author__ = 'Russel Van Tuyl'
 __maintainer__ = "Russel Van Tuyl"
 __email__ = "Russel.VanTuyl@gmail.com"
-__version__ = "1.1"
+__version__ = "1.2"
 
 import sqlite3
 import datetime
@@ -307,10 +307,17 @@ def check_empire_agents(db):
         if a not in knownAgents["empire"]:
             knownAgents["empire"].append(a)
             if checkin > runTime:
-                msg = "Agent ID: %s\nCheckin Time: %s" % (agents[a]['session_id'], agents[a]['checkin_time'])
-                send_new_agent_message_slack("Empire", msg)
-                teams = {"session_id": agents[a]['session_id'], "checkin_time": agents[a]['checkin_time']}
-                send_new_agent_message_teams("Empire", agents[a])
+                if slackHook is not None:
+                    msg = "Agent ID: %s\nCheckin Time: %s" % (agents[a]['session_id'], agents[a]['checkin_time'])
+                    send_new_agent_message_slack("Empire", msg)
+                else:
+                    if VERBOSE:
+                        print note + "Slack hook not provided, skipping"
+                if teamsHook is not None:
+                    send_new_agent_message_teams("Empire", agents[a])
+                else:
+                    if VERBOSE:
+                        print note + "Teams hook not provided, skipping"
 
 
 def check_msf_agents():
