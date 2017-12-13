@@ -3,7 +3,7 @@
 __author__ = 'Russel Van Tuyl'
 __maintainer__ = "Russel Van Tuyl"
 __email__ = "Russel.VanTuyl@gmail.com"
-__version__ = "1.2"
+__version__ = "1.2.1"
 
 import sqlite3
 import datetime
@@ -124,10 +124,13 @@ def msf_rpc_get_session_list():
 
     payload = msgpack.packb(["session.list", msfRpcToken])
     response = msf_rpc_request(payload)
-    result = msgpack.unpackb(response.content, use_list=False)
+    if response is not None:
+        result = msgpack.unpackb(response.content, use_list=False)
 
-    if response.status_code == 200:
-        return result
+        if response.status_code == 200:
+            return result
+        else:
+            return None
     else:
         return None
 
