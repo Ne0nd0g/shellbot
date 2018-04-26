@@ -340,8 +340,16 @@ def check_msf_agents():
                                                                                sessions_result[s]['info'],
                                                                                sessions_result[s]['via_exploit'],
                                                                                sessions_result[s]['via_payload'])
-                    send_new_agent_message_slack("Meterpreter", msg)
-                    send_new_agent_message_teams("Meterpreter", sessions_result[s])
+                    if slackHook is not None:
+                        send_new_agent_message_slack("Meterpreter", msg)
+                    else:
+                        if VERBOSE:
+                            print note + "Slack hook not provided, skipping"
+                    if teamsHook is not None:
+                        send_new_agent_message_teams("Meterpreter", sessions_result[s])
+                    else:
+                        if VERBOSE:
+                            print note + "Teams hook not provided, skipping"
 
 
 if __name__ == '__main__':
