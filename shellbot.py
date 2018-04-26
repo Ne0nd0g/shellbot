@@ -310,13 +310,15 @@ def check_empire_agents(db):
         if a not in knownAgents["empire"]:
             knownAgents["empire"].append(a)
             if checkin > runTime:
-                if slackHook is not None:
+                if slackHook is not None and slackHook != "" and \
+                        slackHook != "https://hooks.slack.com/services/<randomstuff>":
                     msg = "Agent ID: %s\nCheckin Time: %s" % (agents[a]['session_id'], agents[a]['checkin_time'])
                     send_new_agent_message_slack("Empire", msg)
                 else:
                     if VERBOSE:
                         print note + "Slack hook not provided, skipping"
-                if teamsHook is not None:
+                if teamsHook is not None and teamsHook != "" and \
+                        teamsHook != "https://outlook.office.com/webhook/<randomstuff>":
                     send_new_agent_message_teams("Empire", agents[a])
                 else:
                     if VERBOSE:
@@ -340,12 +342,14 @@ def check_msf_agents():
                                                                                sessions_result[s]['info'],
                                                                                sessions_result[s]['via_exploit'],
                                                                                sessions_result[s]['via_payload'])
-                    if slackHook is not None:
+                    if slackHook is not None and slackHook != "" and \
+                            slackHook != "https://hooks.slack.com/services/<randomstuff>":
                         send_new_agent_message_slack("Meterpreter", msg)
                     else:
                         if VERBOSE:
                             print note + "Slack hook not provided, skipping"
-                    if teamsHook is not None:
+                    if teamsHook is not None and teamsHook != "" and \
+                            teamsHook != "https://outlook.office.com/webhook/<randomstuff>":
                         send_new_agent_message_teams("Meterpreter", sessions_result[s])
                     else:
                         if VERBOSE:
@@ -381,6 +385,8 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print "\n" + warn + "User Interrupt! Quitting...."
+    except SystemExit:
+        pass
     except:
         print "\n" + warn + "Please report this error to " + __maintainer__ + " by email at: " + __email__
         raise
