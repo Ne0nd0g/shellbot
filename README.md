@@ -41,8 +41,6 @@ msfRpcHost = 127.0.0.1
 msfRpcPort = 55552
 msfRpcUser = msf
 msfRpcPass = SuperSecret
-[teams]
-teamsHook = https://outlook.office.com/webhook/<randomstuff>
 ```
 
 ### MSFRPC
