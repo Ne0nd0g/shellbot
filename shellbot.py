@@ -28,6 +28,7 @@ runTime = datetime.datetime.now()
 sleepTime = 60
 slackHook = None
 teamsHook = None
+mmHook = None
 botName = None
 channel = None
 empireDb = None
@@ -199,6 +200,33 @@ def send_new_agent_message_teams(agentType, payload):
     else:
         print warn + "Message not posted to Microsoft Teams. HTTP Status Code: %s" % response.status_code
 
+def send_new_agent_message_mattermost(agentType, payload):
+    """Send New Agent Message to MatterMost"""
+
+    if DEBUG:
+        print debug + "New MatterMost agent message agent: %s, payload: %s" % (agentType, payload)
+
+    text = "[+]New %s agent check in\n%s" % (agentType, payload)
+    if agentType == "Meterpreter":
+        json_payload = {"username": "ShellBot", "text": text, "icon_emoji": ":metasploit:"}
+    elif agentType == "Empire":
+        json_payload = {"username": "ShellBot", "text": text, "icon_emoji": ":empire:"}
+    else:
+        json_payload = {"username": "ShellBot", "text": text}
+
+    headers = {'content-type': 'application/json'}
+
+    response = requests.post(mmHook, json=json_payload, headers=headers, verify=False)
+
+    if DEBUG:
+        print debug + "%s" % response.text
+        print debug + "%d" % response.status_code
+    if response.status_code == 200:
+        print "\033[0;0;92m[+]\033[0mNew %s agent check in successfully posted to MatterMost" % agentType
+        print "\t" + note + "%s" % payload.replace("\n", ", ")
+    else:
+        print warn + "Message not posted to MatterMost. HTTP Status Code: %s" % response.status_code
+
 
 def parse_config(configFile):
     """Parse the ShellBot configuration file and update global variables"""
@@ -239,6 +267,22 @@ def parse_config(configFile):
     else:
         print warn + "Missing 'slack' section in configuration file"
         sys.exit(1)
+
+    if c.has_section("mattermost"):
+        if c.has_option("mattermost", "mmHook"):
+            mmHook = c.get("mattermost", "mmHook")
+        else:
+            print warn + "Configuration file missing 'mmHook' parameter in 'mattermost' section"
+            sys.exit(1)
+        if c.has_option("mattermost", "botName"):
+            botName = c.get("mattermost", "botName")
+        else:
+            print warn + "Configuration file missing 'botName' parameter in 'mattermost' section"
+            sys.exit(1)
+    else:
+        print warn + "Missing 'mattermost' section in configuration file"
+        sys.exit(1)
+
 
     # This section can be missing, will use global variables instead
     if c.has_section("ShellBot"):
@@ -323,7 +367,12 @@ def check_empire_agents(db):
                 else:
                     if VERBOSE:
                         print note + "Teams hook not provided, skipping"
-
+                if mmHook is not None and mmHook= "" and mmHook != "https://your-mattermost-instance.com/webhooks/<randomstuff>":
+                    msg = "Agent ID: %s\nCheckin Time: %s" % (agents[a]['session_id'], agents[a]['checkin_time'])
+                    send_new_agent_message_mattermost("Empire", msg)
+                else:
+                    if VERBOSE:
+                        print note + "MatterMost hook not provided, skipping"
 
 def check_msf_agents():
     """Check to see if there are any new meterpreter sessions"""
@@ -355,6 +404,13 @@ def check_msf_agents():
                         if VERBOSE:
                             print note + "Teams hook not provided, skipping"
 
+                    if mmHook is not None and mmHook != "" and \
+                            mmHook != "https://your-matterost-instance.com/webhooks/<randomstuff>":
+                        send_new_agent_message_mattermost("Meterpreter", msg)
+                    else:
+                        if VERBOSE:
+                            print note + "MatterMost hook not provided, skipping"
+
 
 if __name__ == '__main__':
 
@@ -377,7 +433,7 @@ if __name__ == '__main__':
                 if msfRpcToken is not None:
                     check_msf_agents()
                 if VERBOSE:
-                    print info + "Sleeping for %s seconds at %s" % (sleepTime, datetime.datetime.now())
+                   print info + "Sleeping for %s seconds at %s" % (sleepTime, datetime.datetime.now())
                 time.sleep(sleepTime)
         else:
             print warn + "Unable to locate or communicate with any C2 servers. Quitting"

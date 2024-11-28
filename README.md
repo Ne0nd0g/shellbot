@@ -1,5 +1,5 @@
 # ShellBot
-ShellBot is a bot that will post a notification to Slack and/or Microsoft Teams whenever a new Empire or Meterpreter agent connection is received.
+ShellBot is a bot that will post a notification to Slack and/or Microsoft Teams and/or MatterMost whenever a new Empire or Meterpreter agent connection is received.
 A blog post on the bot can be found here: https://www.swordshield.com/2016/11/slackshellbot
 
 ![alt text](images/ShellBot.PNG "ShellBot Output")
@@ -41,6 +41,12 @@ msfRpcHost = 127.0.0.1
 msfRpcPort = 55552
 msfRpcUser = msf
 msfRpcPass = SuperSecret
+<<<<<<< HEAD
+[mattermost]
+mmHook = https://your-mattermost-instance.com/webhooks/<randomstuff>
+botName = ShellBot⏎
+=======
+>>>>>>> ae100dd8f484de9fdaa2a345a9df31fda22960c0
 ```
 
 ### MSFRPC
@@ -91,3 +97,8 @@ Empire Agent Checkin on Microsoft Teams
 Meterpreter Agent Checkin on Microsoft Teams
 
 ![alt text](images/Teams_Meterpreter.PNG "Teams - Empire Agent Checkin")
+
+### MatterMost
+Empire Agent Checkin on MatterMost
+
+![alt text](images/MatterMost_Empire.PNG "MatterMost - Empire Agent Checkin")
